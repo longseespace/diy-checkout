@@ -6,6 +6,7 @@ require.config({
     'celery-js': 'vendor/celery-js/src/index',
     hogan: 'vendor/hogan/web/builds/3.0.2/hogan-3.0.2.amd',
     'jquery.payment': 'vendor/jquery.payment/lib/jquery.payment',
+    'jquery.transit': 'vendor/jquery.transit/jquery.transit',
     text: 'vendor/requirejs-text/text'
   },
   map: {
@@ -15,6 +16,9 @@ require.config({
   },
   shim: {
     'jquery.payment': {
+      deps: ['jquery']
+    },
+    'jquery.transit': {
       deps: ['jquery']
     }
   }

@@ -3,8 +3,8 @@
 define(function(require) {
   return {
     // For testing on sandbox
-    // apiHost: 'https://api-sandbox.trycelery.com',
-    // slug: '53ebdd5e1fd9c90400553dab',
+    apiHost: 'https://api-sandbox.trycelery.com',
+    // slug: '54ed0fc55b5ccd0800fe7c8a',
     features: {
       taxes: false,
       coupons: false

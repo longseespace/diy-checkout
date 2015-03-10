@@ -15,6 +15,8 @@ define(function(require) {
   var form = require('form').initialize();
   var confirmation = require('confirmation').initialize();
 
+  require('jquery.transit');
+
   return {
     initialize: function(options) {
       if (this.initialized) {
@@ -29,6 +31,7 @@ define(function(require) {
       var $modal = this.$el = $(modalTemplate());
       var $form = this.$form = form.$el;
       var $confirmation = this.$confirmation = confirmation.$el;
+      var self = this;
 
       this.children = [$overlay, $modal];
 
@@ -57,17 +60,95 @@ define(function(require) {
       this.$el.on('click', '.Celery-ModalCloseButton', this.hide);
 
       $form.on('valid', this.createOrder);
-      $form.on('change', 'select, [name=shipping_zip]',
-        this.updateOrderSummary);
+      $form.on('change', 'select, [name=variant]', this.updateOrderSummary);
       $form.on('keyup', '[name=coupon]', debounce(this.updateDiscount, 500));
+      $form.on('click', '.Celery-Button--shipping-info', this.showShippingForm);
+
+      $form.on('change', '[name=country]', function(){
+        if (self._getCountry() == 'us') {
+          self.countryUpdated(true);
+        } else {
+          self.countryUpdated(false);
+        }
+      });
 
       $form.find('select').change();
+
+      $form.on('click', '.Celery-ModalBackButton', this.showPaymentForm);
 
       this.showShop();
 
       this.initialized = true;
 
+      if (navigator.appVersion.indexOf("Mac")!=-1) {
+        $(document.body).addClass('mac');
+      }
+
+      // Zip cache
+      this._zipcodes = {};
+      $form.on('blur', '[name=zip]', function(){
+        if (self._getCountry() == 'us') {
+          self.autofill(self._getZip());  
+        };
+      });
+
       return this;
+    },
+
+    countryUpdated: function(isUS) {
+      var $group = form.$el.find('#group-state');
+      if (isUS) {
+        $group.find('input').attr('disabled', 'disabled');
+        $group.find('select').removeAttr('disabled').val('al');
+        $group.find('.Celery-Select').removeClass('u-hidden');
+
+        form.$el.find('[name=zip]').attr('placeholder', 'Zip Code').data('celery-validate', 'required');
+        form.$el.find('[name=city]').data('celery-validate', 'required');
+      } else {
+        $group.find('input').removeAttr('disabled').val('');
+        $group.find('select').attr('disabled', 'disabled');
+        $group.find('.Celery-Select').addClass('u-hidden');
+
+        form.$el.find('[name=zip]').attr('placeholder', 'Postal Code').data('celery-validate', '');
+        form.$el.find('[name=city]').data('celery-validate', '');
+      }
+    },
+
+    autofill: function(zip) {
+      var lat;
+      var lng;
+
+      var compIsType = function(t, s) { 
+        for(var z = 0; z < t.length; ++z) 
+          if(t[z] == s)
+            return true;
+        return false;
+      }
+
+      var geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ 'address': zip }, function (results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+          geocoder.geocode({'latLng': results[0].geometry.location}, function(results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+              if (results[1]) {
+                var a = results[0].address_components;
+                var city, state;
+                for (var i = 0; i < a.length; ++i){
+                  var t = a[i].types;
+                  if (compIsType(t, 'administrative_area_level_1')) {
+                    state = a[i].short_name.toLowerCase(); //store the state
+                  } else if(compIsType(t, 'locality')) {
+                    city = a[i].long_name; //store the city
+                  }
+                }
+                
+                form.$el.find('[name=city]').val(city);
+                form.$el.find('[name=state]').val(state);
+              }
+            }
+          });
+        }
+      }); 
     },
 
     loadShop: function() {
@@ -79,7 +160,108 @@ define(function(require) {
         celeryClient.config.slug = slug;
       }
 
-      shop.fetch(this.updateOrderSummary);
+      var tasks = [this.updateVariants, this.updateOrderSummary];
+
+      shop.fetch(function(){
+        for (var i = 0; i < tasks.length; i++) {
+          var task = tasks[i];
+          task();
+        };
+      });
+    },
+
+    showShippingForm: function(e) {
+      e.preventDefault();
+
+      var $paymentInfo = $('#payment-info');
+      var $shippingInfo = $('#shipping-info');
+      var $buyButton = form.$el.find('.Celery-Button--buy');
+      var $shippingButton = form.$el.find('.Celery-Button--shipping-info');
+
+      var $closeButton = form.$el.find('.Celery-ModalCloseButton');
+      var $backButton = form.$el.find('.Celery-ModalBackButton');
+
+      if (!$shippingInfo.hasClass('u-hidden')) {
+        return;
+      };
+
+      var $email = form.$el.find('.Celery-TextInput--email');
+      var $cardNumber = form.$el.find('.Celery-TextInput--cardNumber');
+      var $expiry = form.$el.find('.Celery-TextInput--expiry');
+      var $cvc = form.$el.find('.Celery-TextInput--cvc');
+
+      if (($email.hasClass('is-valid') && 
+        $cardNumber.hasClass('is-valid') &&
+        $expiry.hasClass('is-valid') &&
+        $cvc.hasClass('is-valid')) || false) 
+      {
+        $paymentInfo.transition({ opacity: 0, x: -100 }, 400, function() {
+          $paymentInfo.addClass('u-hidden');
+          $shippingInfo.addClass('ready');
+        });
+
+        $shippingInfo.removeClass('u-hidden');
+
+        $shippingInfo.transition({ opacity: 1 }, 600, function() {
+          $shippingInfo.addClass('animated');
+        })
+
+        $buyButton.removeClass('u-hidden');
+        $shippingButton.addClass('u-hidden');
+
+        $backButton.removeClass('u-hidden');
+        $closeButton.addClass('u-hidden');
+      } else {
+        form.validateField($email);
+        form.validateField($cardNumber);
+        form.validateField($expiry);
+        form.validateField($cvc);
+      }
+    },
+
+    showPaymentForm: function(e) {
+      e.preventDefault();
+
+      var $paymentInfo = $('#payment-info');
+      var $shippingInfo = $('#shipping-info');
+      var $buyButton = form.$el.find('.Celery-Button--buy');
+      var $shippingButton = form.$el.find('.Celery-Button--shipping-info');
+
+      var $closeButton = form.$el.find('.Celery-ModalCloseButton');
+      var $backButton = form.$el.find('.Celery-ModalBackButton');
+
+      $shippingInfo.removeClass('animated');
+      $shippingInfo.removeClass('ready');
+
+      $shippingInfo.transition({ opacity: 0 }, 400, function() {
+        $shippingInfo.addClass('u-hidden');
+      })
+
+      $paymentInfo.removeClass('u-hidden');
+      $paymentInfo.transition({ opacity: 1, x: 0 }, 400, function() {
+        // $paymentInfo.addClass('u-hidden');
+      });
+
+      $buyButton.addClass('u-hidden');
+      $shippingButton.removeClass('u-hidden');
+
+      $backButton.addClass('u-hidden');
+      $closeButton.removeClass('u-hidden');
+    },
+
+    updateVariants: function() {
+      var shopData = shop.data;
+      if (!shopData) return;
+
+      var variants = shop.data.product.variants;
+      if (!variants) return;
+
+      var $variants = form.$el.find('.Celery-Form-group--variant select');
+      $variants.html('');
+      for (var i = 0; i < variants.length; i++) {
+        var item = variants[i];
+        $variants.append('<option value="'+item.id+'">'+item.name+'</option>');
+      };
     },
 
     show: function() {
@@ -307,11 +489,18 @@ define(function(require) {
       card.exp_year = expiryParts[1].trim();
 
       // Shipping
-      order.shipping_address.country = this._getCountry();
-
-      if (config.features.taxes) {
-        order.shipping_address.zip = this._getZip();
-      }
+      order.shipping_address.first_name = this._getFirstName();
+      order.shipping_address.last_name = this._getLastName();
+      order.shipping_address.line1 = this._getAddress();
+      order.shipping_address.line2 = this._getApt();
+      order.shipping_address.zip = this._getZip();
+      order.shipping_address.city = this._getCity();
+      order.shipping_address.country = this._getCountry() || 'zz';
+      
+      // Buyer
+      order.buyer.first_name = this._getFirstName();
+      order.buyer.last_name = this._getLastName();
+      order.buyer.notes = this._getNotes();
 
       // Coupon
       if (config.features.coupons) {
@@ -325,6 +514,7 @@ define(function(require) {
       // Line Item
       var lineItem = {
         product_id: shop.data.product._id,
+        variant_id: this._getVariant(),
         quantity: this._getQuantity()
       };
 
@@ -347,6 +537,10 @@ define(function(require) {
       return code.toLowerCase();
     },
 
+    _getVariant: function() {
+      return this._getFieldValue('variant');
+    },
+
     _getQuantity: function() {
       return this._getFieldValue('quantity');
     },
@@ -355,12 +549,40 @@ define(function(require) {
       return this._getFieldValue('country');
     },
 
+    _getFirstName: function() {
+      return this._getFieldValue('first_name');
+    },
+
+    _getLastName: function() {
+      return this._getFieldValue('last_name');
+    },
+
+    _getAddress: function() {
+      return this._getFieldValue('line1');
+    },
+
+    _getApt: function() {
+      return this._getFieldValue('line2');
+    },
+
+    _getCity: function() {
+      return this._getFieldValue('city');
+    }, 
+
+    _getState: function() {
+      return this._getFieldValue('state');
+    }, 
+
     _getZip: function() {
-      return this._getFieldValue('shipping_zip');
+      return this._getFieldValue('zip');
+    },
+
+    _getNotes: function() {
+      return this._getFieldValue('notes');
     },
 
     _getFieldValue: function(fieldName) {
-      var $field = this.$form.find('[name=' + fieldName + ']');
+      var $field = this.$form.find('[name=' + fieldName + ']:enabled');
 
       if (!$field.length) {
         return;
@@ -370,7 +592,25 @@ define(function(require) {
     },
 
     _getPrice: function() {
-      return shop.data.product && shop.data.product.price;
+      var product = shop.data.product;
+      var variantId = this._getVariant();
+      var variant = 0;
+
+      if (product && product.variants && product.variants.length > 0 && variantId) {
+        for (var i = 0; i < product.variants.length; i++) {
+          var item = product.variants[i];
+          if (item.id == variantId) {
+            variant = item;
+            break;
+          };
+        };
+      }
+
+      if (typeof(variant) === 'object') {
+        return variant.price;
+      };
+
+      return product && product.price;
     },
 
     _getSubtotal: function() {
