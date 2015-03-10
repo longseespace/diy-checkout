@@ -6,7 +6,7 @@
 @modal-back-button-font-size: 30px;
 
 .Celery-OrderConfirmation .Celery-ModalCloseButton {
-  color: white;
+  color: @white;
 }
 
 .Celery-ModalCloseButton {
@@ -44,5 +44,11 @@
 
   &:hover {
     cursor: pointer;
+  }
+}
+
+@media screen and (max-width: @breakpoint-small) {
+  .Celery-ModalCloseButton, .Celery-ModalBackButton {
+    display: none;
   }
 }

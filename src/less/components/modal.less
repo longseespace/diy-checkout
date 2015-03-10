@@ -8,11 +8,12 @@
 @modal-heading-gutter: 30px;
 @modal-heading-font-size: 38px;
 @modal-heading-color: @white;
-@modal-subheading-font-size: 18px;
+@modal-subheading-font-size: 16px;
 @modal-subheading-color: @gray-light;
 
 @modal-footer-color: @gray;
 @modal-footer-background-color: @white;
+@modal-footer-small-fontsize: 12px;
 
 .Celery-Modal-header {
   margin: @modal-heading-gutter 0;
@@ -27,6 +28,8 @@
   .Celery-Modal-header {
     margin-left: @modal-heading-gutter;
     margin-right: @modal-heading-gutter;
+    margin-top: 0;
+    margin-bottom: 0;
   }
 }
 
@@ -62,14 +65,30 @@
   border-radius: @border-radius-large;
 }
 
+.Celery-Modal-footer {
+  text-align: center;
+  color: @modal-footer-color;
+  width: @modal-width;
+  margin: 0 auto;
+
+  p {
+    padding: 0 40px;
+  }
+}
+
 @media screen and (max-width: @breakpoint-small) {
   .Celery-Modal-body {
     width: auto;
     border-radius: 0;
   }
+
+  .Celery-Modal-footer {
+    width: auto;
+    p {
+      font-size: @modal-footer-small-fontsize;
+      padding: 0 5px;
+    }
+  }
 }
 
-.Celery-Modal-footer {
-  text-align: center;
-  color: @modal-footer-color;
-}
+

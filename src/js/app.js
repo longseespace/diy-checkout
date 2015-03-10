@@ -96,6 +96,11 @@ define(function(require) {
       return this;
     },
 
+    noShippingRequired : function() {
+      var $shippingForm = $('#shipping-info');
+      $shippingForm.find('input').removeAttr('data-celery-validate');
+    },
+
     countryUpdated: function(isUS) {
       var $group = form.$el.find('#group-state');
       if (isUS) {
@@ -183,7 +188,7 @@ define(function(require) {
       var $closeButton = form.$el.find('.Celery-ModalCloseButton');
       var $backButton = form.$el.find('.Celery-ModalBackButton');
 
-      if (!$shippingInfo.hasClass('u-hidden')) {
+      if ($shippingInfo.opacity) {
         return;
       };
 
@@ -202,14 +207,14 @@ define(function(require) {
           $shippingInfo.addClass('ready');
         });
 
-        $shippingInfo.removeClass('u-hidden');
+        $shippingInfo.show();
 
         $shippingInfo.transition({ opacity: 1 }, 600, function() {
           $shippingInfo.addClass('animated');
         })
 
-        $buyButton.removeClass('u-hidden');
-        $shippingButton.addClass('u-hidden');
+        $buyButton.css('display', 'block');
+        $shippingButton.hide();
 
         $backButton.removeClass('u-hidden');
         $closeButton.addClass('u-hidden');
@@ -236,7 +241,7 @@ define(function(require) {
       $shippingInfo.removeClass('ready');
 
       $shippingInfo.transition({ opacity: 0 }, 400, function() {
-        $shippingInfo.addClass('u-hidden');
+        $shippingInfo.hide();
       })
 
       $paymentInfo.removeClass('u-hidden');
@@ -244,8 +249,8 @@ define(function(require) {
         // $paymentInfo.addClass('u-hidden');
       });
 
-      $buyButton.addClass('u-hidden');
-      $shippingButton.removeClass('u-hidden');
+      $buyButton.hide();
+      $shippingButton.show();
 
       $backButton.addClass('u-hidden');
       $closeButton.removeClass('u-hidden');
@@ -264,6 +269,10 @@ define(function(require) {
         var item = variants[i];
         $variants.append('<option value="'+item.id+'">'+item.name+'</option>');
       };
+    },
+
+    isMobile: function() {
+      return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
     },
 
     show: function() {
@@ -287,6 +296,11 @@ define(function(require) {
         // is-hidden uses opacity/transform so the transition occurs
         self.$overlay.removeClass('is-hidden');
         self.$el.removeClass('is-hidden');
+
+        // if mobile
+        if (self.isMobile()) {
+          self.noShippingRequired();
+        }
       }, 0);
       return this;
     },
@@ -462,6 +476,7 @@ define(function(require) {
     },
 
     _generateOrder: function() {
+      var self = this;
       var $form = this.$form;
       var order = {
         buyer: {},
@@ -494,13 +509,15 @@ define(function(require) {
       card.exp_year = expiryParts[1].trim();
 
       // Shipping
-      order.shipping_address.first_name = this._getFirstName();
-      order.shipping_address.last_name = this._getLastName();
-      order.shipping_address.line1 = this._getAddress();
-      order.shipping_address.line2 = this._getApt();
-      order.shipping_address.zip = this._getZip();
-      order.shipping_address.city = this._getCity();
-      order.shipping_address.country = this._getCountry() || 'zz';
+      if (!self.isMobile()) {
+        order.shipping_address.first_name = this._getFirstName();
+        order.shipping_address.last_name = this._getLastName();
+        order.shipping_address.line1 = this._getAddress();
+        order.shipping_address.line2 = this._getApt();
+        order.shipping_address.zip = this._getZip();
+        order.shipping_address.city = this._getCity();
+        order.shipping_address.country = this._getCountry() || 'zz';
+      }
       
       // Buyer
       order.buyer.first_name = this._getFirstName();
