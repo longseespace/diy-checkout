@@ -15,6 +15,8 @@ define(function(require) {
   var form = require('form').initialize();
   var confirmation = require('confirmation').initialize();
 
+  var fbpixel = require('fbpixel');
+
   require('jquery.transit');
 
   return {
@@ -84,10 +86,9 @@ define(function(require) {
         $(document.body).addClass('mac');
       }
 
-      // Zip cache
-      this._zipcodes = {};
-      $form.on('blur', '[name=zip]', function(){
-        if (self._getCountry() == 'us') {
+      // Zipcode
+      $form.on('keyup', '[name=zip]', function(){
+        if (self._getCountry() == 'us' && $(this).val().length == 5) {
           self.autofill(self._getZip());  
         };
       });
@@ -141,9 +142,10 @@ define(function(require) {
                     city = a[i].long_name; //store the city
                   }
                 }
-                
-                form.$el.find('[name=city]').val(city);
-                form.$el.find('[name=state]').val(state);
+                if (city && state) {
+                  form.$el.find('[name=city]').val(city);
+                  form.$el.find('[name=state]').val(state);
+                };
               }
             }
           });
@@ -193,7 +195,7 @@ define(function(require) {
       if (($email.hasClass('is-valid') && 
         $cardNumber.hasClass('is-valid') &&
         $expiry.hasClass('is-valid') &&
-        $cvc.hasClass('is-valid')) || false) 
+        $cvc.hasClass('is-valid')) || config.debug) 
       {
         $paymentInfo.transition({ opacity: 0, x: -100 }, 400, function() {
           $paymentInfo.addClass('u-hidden');
@@ -278,6 +280,8 @@ define(function(require) {
       this.$overlay.removeClass('u-hidden');
       this.$el.removeClass('u-hidden');
 
+      fbpixel.push(config.pixels.checkout);
+
       // next tick
       setTimeout(function() {
         // is-hidden uses opacity/transform so the transition occurs
@@ -354,6 +358,7 @@ define(function(require) {
 
     onConfirmation: function(data) {
       // Runs on confirmation with order data
+      fbpixel.push(config.pixels.purchase);
     },
 
     handleError: function(err) {
