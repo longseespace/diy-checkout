@@ -1,3 +1,5 @@
+@import 'mixins/input';
+
 @form-group-margin: @grid-small-gutter;
 @form-group-padding: @grid-small-gutter / 2;
 
@@ -45,6 +47,52 @@
 
 .Celery-Form-group--expiry {
   width: 10em;
+}
+
+.Celery-Form-group--payment-method {
+  .selection-buttons {
+    clear: left; 
+    margin-bottom: 0; 
+    overflow: hidden;
+  }
+
+  .item {
+    -webkit-tap-highlight-color: rgba(0,0,0,0); 
+    width: 80px; 
+    display: inline-block; 
+    float: left; 
+    margin-left: 0;
+
+    svg {
+      border-radius: 3px;
+      border: 2px solid transparent;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    input[type=radio]:checked ~ label, &:hover {
+      svg {
+        border: 2px solid #56A7D9;
+      }
+    }
+  }
+
+  input.payment-method {
+    position: absolute!important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px,1px,1px,1px);
+  }
+
+  label {
+    display: block; 
+    vertical-align: top;
+    padding-bottom: 10px;
+  }
+
+  .label {
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
 }
 
 #group-state {

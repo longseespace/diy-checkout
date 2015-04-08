@@ -18,6 +18,7 @@ define(function(require) {
   var fbpixel = require('fbpixel');
 
   require('jquery.transit');
+  require('jquery.cookie');
 
   return {
     initialize: function(options) {
@@ -65,6 +66,7 @@ define(function(require) {
       $form.on('change', 'select, [name=variant]', this.updateOrderSummary);
       $form.on('keyup', '[name=coupon]', debounce(this.updateDiscount, 500));
       $form.on('click', '.Celery-Button--shipping-info', this.showShippingForm);
+      $form.on('change', '[name=payment_method]', this.paymentMethodUpdated);
 
       $form.on('change', '[name=country]', function(){
         if (self._getCountry() == 'us') {
@@ -93,7 +95,58 @@ define(function(require) {
         };
       });
 
+      // Paypal confirmation
+      $(window).on('hashchange', function() {
+        var hash = window.location.hash.replace('#', '');
+        var parts = hash.split('/');
+        var action = parts[0];
+        var orderNo = parts.length > 1 ? +parts[1] : null;
+
+        if (action === 'completed') {
+          if (orderNo == null || orderNo == 0) {
+            // show error
+            self.show();
+            self.showConfirmation({
+              error: true
+            });
+          } else {
+            // show confirmation
+            self.show();
+            self.showConfirmation({
+              buyer : {
+                email: $.cookie('buyer.email') ? $.cookie('buyer.email') : ''
+              },
+              number : orderNo,
+              completed: true
+            });
+          }
+        } else if (action === 'cancelled') {
+          // show cancelled
+          self.show();
+          self.showConfirmation({
+            cancelled: true
+          });
+        }
+      });
+
+      $(window).trigger('hashchange');
+
       return this;
+    },
+
+    paymentMethodUpdated: function() {
+      var method = $(this).val();
+      var $form = $('#creditcards-form');
+      var $buyButton = form.$el.find('.Celery-Button--buy');
+      if (method === 'creditcards') {
+        $form.show();
+        $form.insertAfter('.Celery-Form-group--payment-method');
+        $buyButton.text("Buy Now");
+      } else {
+        $form.hide();
+        $form.appendTo('body');
+        $buyButton.text("Checkout with PayPal");
+      }
     },
 
     noShippingRequired : function() {
@@ -275,7 +328,8 @@ define(function(require) {
       return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
     },
 
-    show: function() {
+    show: function(e) {
+      e && e.preventDefault();
       var self = this;
 
       // Load shop data if it wasn't loaded yet
@@ -315,6 +369,9 @@ define(function(require) {
       var self = this;
 
       this.clear();
+
+      // window.location.hash = '';
+      history.pushState("", document.title, window.location.pathname);
 
       // is-hidden uses opacity/transform so the transition occurs
       this.$overlay.addClass('is-hidden');
@@ -379,13 +436,19 @@ define(function(require) {
         return this.handleError(err);
       }
 
-      this.showConfirmation(res.data);
-      this.onConfirmation(res.data);
+      if (res.data.type.indexOf('paypal') === 0) {
+        $.cookie('buyer.email', res.data.buyer.email);
+        window.location = res.data.payment_source.paypal.redirect_url;
+      } else {
+        res.data.completed = true;
+        this.showConfirmation(res.data);
+        this.onConfirmation(res.data);
+      }
     },
 
     onConfirmation: function(data) {
       // Runs on confirmation with order data
-      if (config.features.conversionTracking) {
+      if (config.features.conversionTracking && data.completed) {
         fbpixel.push(config.pixels.purchase);
       }
     },
@@ -497,31 +560,11 @@ define(function(require) {
         buyer: {},
         shipping_address: {},
         line_items: [],
-        payment_source: {
-          card: {
-            number: '',
-            exp_month: '',
-            exp_year: '',
-            cvc: ''
-          }
-        }
+        payment_source: null
       };
 
       order.user_id = shop.data.user_id;
       order.buyer.email = this._getFieldValue('email');
-
-      // Card
-      var card = order.payment_source.card;
-
-      card.number = this._getFieldValue('card_number');
-      card.cvc = this._getFieldValue('cvc');
-
-      // Card Expiry
-      var expiry = this._getFieldValue('expiry');
-      var expiryParts = expiry.split('/');
-
-      card.exp_month = expiryParts[0].trim();
-      card.exp_year = expiryParts[1].trim();
 
       // Shipping
       if (!self.isMobile() && config.features.shipping) {
@@ -557,6 +600,39 @@ define(function(require) {
       };
 
       order.line_items.push(lineItem);
+
+      // Payment method
+      var paymentMethod = $('[name=payment_method]:checked').val();
+
+      if (paymentMethod === 'creditcards') {
+        order.payment_source = {
+          card: {
+            number: '',
+            exp_month: '',
+            exp_year: '',
+            cvc: ''
+          }
+        };
+
+        order.payment_method = 'stripe';
+
+        // Card
+        var card = order.payment_source.card;
+
+        card.number = this._getFieldValue('card_number');
+        card.cvc = this._getFieldValue('cvc');
+
+        // Card Expiry
+        var expiry = this._getFieldValue('expiry');
+        var expiryParts = expiry.split('/');
+
+        card.exp_month = expiryParts[0].trim();
+        card.exp_year = expiryParts[1].trim();
+      } else {
+        order.payment_method = 'paypal';
+        order.cancel_url = config.paypal.cancelUrl;
+        order.return_url = config.paypal.returnUrl;
+      }
 
       return order;
     },

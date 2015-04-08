@@ -14,10 +14,11 @@
     "almond": "~0.2.9",
     "jquery.payment": "1.1.2",
     "accounting.js": "0.3.2",
-    "celery-js": "0.0.2",
+    "celery-js": "longseespace/celery-js#0.0.3",
     "suitcss-utils-display": "suitcss/utils-display#~0.4.1",
     "hogan": "~3.0.2",
-    "jquery.transit": "~0.9.12"
+    "jquery.transit": "~0.9.12",
+    "jquery-cookie": "~1.4.1"
   },
   "devDependencies": {
     "requirejs": "~2.1.14",

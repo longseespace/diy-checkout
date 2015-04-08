@@ -8,11 +8,27 @@
 
 @order-confirmation-max-width: 300px;
 
+@firebrick: #B22222;
+@darkorchid: #9932CC;
+
 .Celery-OrderConfirmation {
   padding-top: @order-confirmation-padding;
   background-color: @green;
   color: @white;
   text-align: center;
+
+  .Celery-Icon.Celery-Icon--hero svg {
+    width: 56px;
+    height: 56px;
+  }
+
+  &.Celery-StatusCancelled {
+    background-color: @darkorchid;
+  }
+
+  &.Celery-StatusError {
+    background-color: @firebrick;
+  }
 }
 
 .Celery-OrderConfirmation-header {

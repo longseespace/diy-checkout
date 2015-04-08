@@ -4,6 +4,8 @@ define(function(require) {
 
   // Icons
   var checkIcon = require('text!templates/svg/check.svg');
+  var xIcon = require('text!templates/svg/x.svg');
+  var errorIcon = require('text!templates/svg/error.svg');
   var emailIcon = require('text!templates/svg/email.svg');
   var facebookIcon = require('text!templates/svg/facebook.svg');
   var twitterIcon = require('text!templates/svg/twitter.svg');
@@ -79,11 +81,15 @@ define(function(require) {
     _appendIcons: function() {
       var $el = this.$el;
       var $check = $(checkIcon);
+      var $x = $(xIcon);
+      var $error = $(errorIcon);
       var $twitter = $(twitterIcon);
       var $facebook = $(facebookIcon);
       var $email = $(emailIcon);
 
       $el.find('.Celery-Icon--check').append($check);
+      $el.find('.Celery-Icon--x').append($x);
+      $el.find('.Celery-Icon--error').append($error);
       $el.find('.Celery-Icon--twitter').append($twitter);
       $el.find('.Celery-Icon--facebook').append($facebook);
       $el.find('.Celery-Icon--email').append($email);

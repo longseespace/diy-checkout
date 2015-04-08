@@ -13,6 +13,8 @@ define(function(require) {
   var cvcIcon = require('text!templates/svg/cvc.svg');
   var dateIcon = require('text!templates/svg/date.svg');
   var emailIcon = require('text!templates/svg/email.svg');
+  var creditcardsIcon = require('text!templates/svg/creditcards.svg');
+  var paypalIcon = require('text!templates/svg/paypal.svg');
 
   return {
     initialize: function() {
@@ -49,6 +51,8 @@ define(function(require) {
       $el.find('.Celery-Icon--cvc').append($(cvcIcon));
       $el.find('.Celery-Icon--date').append($(dateIcon));
       $el.find('.Celery-Icon--email').append($(emailIcon));
+      $el.find('.Celery-Icon--creditcards').append($(creditcardsIcon));
+      $el.find('.Celery-Icon--paypal').append($(paypalIcon));
     },
 
     initFormatting: function() {

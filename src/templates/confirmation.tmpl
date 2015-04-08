@@ -1,19 +1,27 @@
-<div class="Celery-OrderConfirmation">
+<div class="Celery-OrderConfirmation Celery-Status{{#cancelled}}Cancelled{{/cancelled}}{{#error}}Error{{/error}}">
   <a class="Celery-ModalCloseButton">
     &times;
   </a>
 
-  <span class="Celery-Icon Celery-Icon--check Celery-Icon--hero">
+  <span class="Celery-Icon Celery-Icon--{{#completed}}check{{/completed}}{{#cancelled}}x{{/cancelled}}{{#error}}error{{/error}} Celery-Icon--hero">
   </span>
 
   <div class="Celery-OrderConfirmation-header">
     <h1 class="Celery-OrderConfirmation-heading">
-      Thank you
+      {{#completed}}Thank you{{/completed}}{{#cancelled}}Cancelled{{/cancelled}}{{#error}}Error{{/error}}
     </h1>
   </div>
 
   <div class="Celery-OrderConfirmation-body">
+    {{#completed}}
     Your order number is <a target='_blank' href='//dashboard.trycelery.com/status?number={{number}}&amp;email={{buyer.email}}'>#{{number}}</a> <br/>A confirmation email is on the way to your inbox.
+    {{/completed}}
+    {{#cancelled}}
+    Your order has been cancelled.
+    {{/cancelled}}
+    {{#error}}
+    An unknown error occurred.
+    {{/error}}
   </div>
 
   <div class="Celery-OrderConfirmation-footer">

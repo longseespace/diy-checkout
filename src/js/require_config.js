@@ -7,6 +7,7 @@ require.config({
     hogan: 'vendor/hogan/web/builds/3.0.2/hogan-3.0.2.amd',
     'jquery.payment': 'vendor/jquery.payment/lib/jquery.payment',
     'jquery.transit': 'vendor/jquery.transit/jquery.transit',
+    'jquery.cookie': 'vendor/jquery-cookie/jquery.cookie',
     text: 'vendor/requirejs-text/text'
   },
   map: {
@@ -19,6 +20,9 @@ require.config({
       deps: ['jquery']
     },
     'jquery.transit': {
+      deps: ['jquery']
+    },
+    'jquery.cookie': {
       deps: ['jquery']
     }
   }

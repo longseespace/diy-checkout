@@ -82,58 +82,82 @@
         </div>
 
         <div class="Celery-FormSection-body">
-          <div class="Celery-Form-group">
-            <input class="Celery-TextInput Celery-TextInput--cardNumber" id="card_number"
-              type="tel"
-              autocomplete="off"
-              autocorrect="off"
-              spellcheck="off"
-              autocapitalize="off"
-              autocompletetype="off"
-              x-autocompletetype="off"
-              name="card_number"
-              pattern="\d*"
-              placeholder="Credit Card Number"
-              data-celery-validate="cardNumber" />
-            <span class="Celery-Icon Celery-Icon--innerInput Celery-Icon--card">
-            </span>
+          <div class="Celery-Form-group Celery-Form-group--payment-method">
+            <div class="selection-buttons">
+              <div class="item">
+                <input type="radio" id="pm-creditcards" value="creditcards" name="payment_method" class="payment-method" checked="checked">
+                <label for="pm-creditcards">
+                  <div class="Celery-Icon--creditcards">
+                    
+                  </div>
+                </label>
+              </div>
+              <div class="item">
+                <input type="radio" id="pm-paypal" value="paypal" name="payment_method" class="payment-method">
+                <label for="pm-paypal">
+                  <div class="Celery-Icon--paypal">
+                    
+                  </div>
+                </label>
+              </div>
+            </div>
           </div>
-          <div class="Celery-Form-group Celery-Form-group--inline Celery-Form-group--expiry">
-            <input class="Celery-TextInput Celery-TextInput--expiry"
-              type="text"
-              name="expiry"
-              id="cc-exp"
-              autocomplete="off"
-              autocorrect="off"
-              spellcheck="off"
-              autocapitalize="off"
-              autocompletetype="off"
-              x-autocompletetype="off"
-              pattern="\d*"
-              placeholder="MM / YY"
-              data-celery-validate="expiry"
-              maxlength="7" />
-            <span class="Celery-Icon Celery-Icon--innerInput Celery-Icon--date">
-            </span>
+
+          <div id="creditcards-form">
+            <div class="Celery-Form-group" id="creditcards-form">
+              <input class="Celery-TextInput Celery-TextInput--cardNumber" id="card_number"
+                type="tel"
+                autocomplete="off"
+                autocorrect="off"
+                spellcheck="off"
+                autocapitalize="off"
+                autocompletetype="off"
+                x-autocompletetype="off"
+                name="card_number"
+                pattern="\d*"
+                placeholder="Credit Card Number"
+                data-celery-validate="cardNumber" />
+              <span class="Celery-Icon Celery-Icon--innerInput Celery-Icon--card">
+              </span>
+            </div>
+            <div class="Celery-Form-group Celery-Form-group--inline Celery-Form-group--expiry">
+              <input class="Celery-TextInput Celery-TextInput--expiry"
+                type="text"
+                name="expiry"
+                id="cc-exp"
+                autocomplete="off"
+                autocorrect="off"
+                spellcheck="off"
+                autocapitalize="off"
+                autocompletetype="off"
+                x-autocompletetype="off"
+                pattern="\d*"
+                placeholder="MM / YY"
+                data-celery-validate="expiry"
+                maxlength="7" />
+              <span class="Celery-Icon Celery-Icon--innerInput Celery-Icon--date">
+              </span>
+            </div>
+            <div class="Celery-Form-group Celery-Form-group--inline Celery-Form-group--cvc">
+              <input class="Celery-TextInput Celery-TextInput--cvc"
+                type="tel"
+                name="cvc"
+                id="cc-csc"
+                pattern="\d*"
+                placeholder="CVC"
+                autocomplete="off"
+                autocorrect="off"
+                spellcheck="off"
+                autocapitalize="off"
+                autocompletetype="off"
+                x-autocompletetype="off"
+                data-celery-validate="cvc"
+                maxlength="4" />
+              <span class="Celery-Icon Celery-Icon--innerInput Celery-Icon--cvc">
+              </span>
+            </div>
           </div>
-          <div class="Celery-Form-group Celery-Form-group--inline Celery-Form-group--cvc">
-            <input class="Celery-TextInput Celery-TextInput--cvc"
-              type="tel"
-              name="cvc"
-              id="cc-csc"
-              pattern="\d*"
-              placeholder="CVC"
-              autocomplete="off"
-              autocorrect="off"
-              spellcheck="off"
-              autocapitalize="off"
-              autocompletetype="off"
-              x-autocompletetype="off"
-              data-celery-validate="cvc"
-              maxlength="4" />
-            <span class="Celery-Icon Celery-Icon--innerInput Celery-Icon--cvc">
-            </span>
-          </div>
+          
         </div>
       </div>
     </div>
