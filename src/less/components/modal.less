@@ -16,7 +16,6 @@
 @modal-footer-small-fontsize: 12px;
 
 .Celery-Modal-header {
-  margin: @modal-heading-gutter 0;
   .transition(opacity);
 
   &.is-hidden {
@@ -63,9 +62,10 @@
   width: @modal-width;
   background: none @modal-body-background-color;
   border-radius: @border-radius-large;
+  font-weight: normal;
 }
 
-.Celery-Modal-footer {
+.Celery-Modal-header, .Celery-Modal-footer {
   text-align: center;
   color: @modal-footer-color;
   width: @modal-width;
@@ -73,6 +73,11 @@
 
   p {
     padding: 0 40px;
+    font-size: 14px;
+    color: #AAA;
+    font-weight: normal;
+    line-height: 19px;
+    margin: 14px 0;
   }
 }
 
@@ -82,7 +87,7 @@
     border-radius: 0;
   }
 
-  .Celery-Modal-footer {
+  .Celery-Modal-header, .Celery-Modal-footer {
     width: auto;
     p {
       font-size: @modal-footer-small-fontsize;

@@ -178,7 +178,7 @@ define(function(require) {
     },
 
     showShippingForm: function(e) {
-      e.preventDefault();
+      e && e.preventDefault();
 
       var $paymentInfo = $('#payment-info');
       var $shippingInfo = $('#shipping-info');
@@ -227,7 +227,7 @@ define(function(require) {
     },
 
     showPaymentForm: function(e) {
-      e.preventDefault();
+      e && e.preventDefault();
 
       var $paymentInfo = $('#payment-info');
       var $shippingInfo = $('#shipping-info');
@@ -289,7 +289,13 @@ define(function(require) {
       this.$overlay.removeClass('u-hidden');
       this.$el.removeClass('u-hidden');
 
-      fbpixel.push(config.pixels.checkout);
+      if (config.features.conversionTracking) {
+        fbpixel.push(config.pixels.checkout)
+      };
+
+      if (config.features.seal) {
+        $('.Celery-Comodo').show();
+      };
 
       // next tick
       setTimeout(function() {
@@ -327,6 +333,13 @@ define(function(require) {
     clear: function() {
       this.$form.find('input').val('');
       this.$form.find('.is-invalid, .is-valid').removeClass('is-invalid is-valid');
+      form.enableBuyButton();
+
+      if (config.features.shipping) {
+        this.$form.find('.Celery-Button--shipping-info').css('display', 'block');
+        this.$form.find('.Celery-Button--buy').css('display', 'none');
+        this.showPaymentForm();
+      };
     },
 
     updateOrderSummary: function() {
@@ -372,7 +385,9 @@ define(function(require) {
 
     onConfirmation: function(data) {
       // Runs on confirmation with order data
-      fbpixel.push(config.pixels.purchase);
+      if (config.features.conversionTracking) {
+        fbpixel.push(config.pixels.purchase);
+      }
     },
 
     handleError: function(err) {
@@ -509,15 +524,16 @@ define(function(require) {
       card.exp_year = expiryParts[1].trim();
 
       // Shipping
-      if (!self.isMobile()) {
+      if (!self.isMobile() && config.features.shipping) {
         order.shipping_address.first_name = this._getFirstName();
         order.shipping_address.last_name = this._getLastName();
         order.shipping_address.line1 = this._getAddress();
         order.shipping_address.line2 = this._getApt();
         order.shipping_address.zip = this._getZip();
         order.shipping_address.city = this._getCity();
-        order.shipping_address.country = this._getCountry() || 'zz';
       }
+
+      order.shipping_address.country = this._getCountry() || 'zz';
       
       // Buyer
       order.buyer.first_name = this._getFirstName();

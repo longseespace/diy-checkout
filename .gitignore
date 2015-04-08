@@ -31,3 +31,4 @@ src/css
 
 # Bower
 src/js/vendor
+config.js

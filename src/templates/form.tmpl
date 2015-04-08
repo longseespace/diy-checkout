@@ -43,6 +43,11 @@
                 <option value="3">3</option>
                 <option value="4">4</option>
                 <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
               </select>
             </div>
           </div>
@@ -79,7 +84,13 @@
         <div class="Celery-FormSection-body">
           <div class="Celery-Form-group">
             <input class="Celery-TextInput Celery-TextInput--cardNumber" id="card_number"
-              type="text"
+              type="tel"
+              autocomplete="off"
+              autocorrect="off"
+              spellcheck="off"
+              autocapitalize="off"
+              autocompletetype="off"
+              x-autocompletetype="off"
               name="card_number"
               pattern="\d*"
               placeholder="Credit Card Number"
@@ -91,6 +102,13 @@
             <input class="Celery-TextInput Celery-TextInput--expiry"
               type="text"
               name="expiry"
+              id="cc-exp"
+              autocomplete="off"
+              autocorrect="off"
+              spellcheck="off"
+              autocapitalize="off"
+              autocompletetype="off"
+              x-autocompletetype="off"
               pattern="\d*"
               placeholder="MM / YY"
               data-celery-validate="expiry"
@@ -100,11 +118,17 @@
           </div>
           <div class="Celery-Form-group Celery-Form-group--inline Celery-Form-group--cvc">
             <input class="Celery-TextInput Celery-TextInput--cvc"
-              type="text"
+              type="tel"
               name="cvc"
+              id="cc-csc"
               pattern="\d*"
               placeholder="CVC"
               autocomplete="off"
+              autocorrect="off"
+              spellcheck="off"
+              autocapitalize="off"
+              autocompletetype="off"
+              x-autocompletetype="off"
               data-celery-validate="cvc"
               maxlength="4" />
             <span class="Celery-Icon Celery-Icon--innerInput Celery-Icon--cvc">
@@ -114,6 +138,7 @@
       </div>
     </div>
 
+    {{#features.shipping}}
     <div id="shipping-info">
       <div class="Celery-FormSection">
         <div class="Celery-FormSection-header">
@@ -212,6 +237,7 @@
         </div>
       </div>
     </div>
+    {{/features.shipping}}
 
     {{#features.coupons}}
       <div class="Celery-FormSection">
@@ -245,7 +271,7 @@
         <span class="Celery-OrderSummary-price Celery-OrderSummary-price--price">
           0
         </span>
-        <span class="Celery-OrderSummary-label">Pre-Order</span>
+        <span class="Celery-OrderSummary-label">Price</span>
       </div>
 
       <span class="Celery-OrderSummary-operator">&times;</span>
@@ -298,15 +324,17 @@
       </div>
     </div>
 
+    {{#features.shipping}}
     <a class="Celery-Button Celery-Button--shipping-info" href="#" tabindex="0">
       Shipping Info
     </a>
+    {{/features.shipping}}
 
-    <a class="Celery-Button Celery-Button--buy" href="#" tabindex="0">
+    <a class="Celery-Button Celery-Button--buy" {{#features.shipping}}style="display: none;"{{/features.shipping}} href="#" tabindex="0">
       Buy Now
     </a>
 
-    <div class="Celery-Note Celery-Note--subtle u-textCenter">
+    <div class="Celery-Note Celery-Note--subtle">
       This page is secured with 128-bit encryption
     </div>
   </div>

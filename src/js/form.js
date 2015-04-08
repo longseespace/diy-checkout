@@ -26,7 +26,8 @@ define(function(require) {
       this.validateField = $.proxy(this.validateField, this);
       this.liveValidate = $.proxy(this.liveValidate, this);
 
-      this.$buyButton.on('click', $.proxy(function() {
+      this.$buyButton.on('click', $.proxy(function(e) {
+        e.preventDefault();
         this.$el.submit();
       }, this));
 
