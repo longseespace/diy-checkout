@@ -1,4 +1,4 @@
-define(function(require) {
+define('app', function(require) {
   'use strict';
 
   var $ = require('jquery');
@@ -16,6 +16,7 @@ define(function(require) {
   var confirmation = require('confirmation').initialize();
 
   var fbpixel = require('fbpixel');
+  var saspixel = require('saspixel');
 
   require('jquery.transit');
   require('jquery.cookie');
@@ -112,13 +113,16 @@ define(function(require) {
           } else {
             // show confirmation
             self.show();
-            self.showConfirmation({
+            var data = {
               buyer : {
                 email: $.cookie('buyer.email') ? $.cookie('buyer.email') : ''
               },
+              amount: $.cookie('order.amount') ? $.cookie('order.amount') : '',
               number : orderNo,
               completed: true
-            });
+            };
+            self.showConfirmation(data);
+            self.onConfirmation(data);
           }
         } else if (action === 'cancelled') {
           // show cancelled
@@ -438,9 +442,11 @@ define(function(require) {
 
       if (res.data.type.indexOf('paypal') === 0) {
         $.cookie('buyer.email', res.data.buyer.email);
+        $.cookie('order.amount', this._getSubtotal());
         window.location = res.data.payment_source.paypal.redirect_url;
       } else {
         res.data.completed = true;
+        res.data.amount = res.data.subtotal;
         this.showConfirmation(res.data);
         this.onConfirmation(res.data);
       }
@@ -450,6 +456,13 @@ define(function(require) {
       // Runs on confirmation with order data
       if (config.features.conversionTracking && data.completed) {
         fbpixel.push(config.pixels.purchase);
+      }
+      if (config.features.sasTracking && data.completed) {
+        saspixel.push({
+          orderId: data.number,
+          amount: data.amount,
+          merchantId: config.sas.merchantId
+        });
       }
     },
 

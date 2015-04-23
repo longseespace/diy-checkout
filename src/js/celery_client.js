@@ -1,4 +1,4 @@
-define(function(require) {
+define('celery_client', function(require) {
   var Celery = require('celery-js');
   var config = require('config');
 

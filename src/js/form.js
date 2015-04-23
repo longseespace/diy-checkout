@@ -1,4 +1,4 @@
-define(function(require) {
+define('form', function(require) {
   'use strict';
 
   var config = require('config');

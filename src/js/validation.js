@@ -1,4 +1,4 @@
-define(function(require) {
+define('validation', function(require) {
   'use strict';
 
   require('jquery.payment');

@@ -1,4 +1,4 @@
-define(function(require) {
+define('shop', function(require) {
   var celeryClient = require('celery_client');
 
   return {

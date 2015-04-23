@@ -1,4 +1,4 @@
-define(function(require) {
+define('format', function(require) {
   var accounting = require('vendor/accounting.js/accounting');
 
   return {

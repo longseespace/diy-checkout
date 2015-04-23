@@ -1,6 +1,6 @@
 // Checkout configuration
 
-define(function(require) {
+define('config', function(require) {
   return {
     // For testing on sandbox
     apiHost: 'https://api-sandbox.trycelery.com',

@@ -1,4 +1,4 @@
-define(function() {
+define('jquery_loader', function() {
   var jquery = window.jQuery || window.$;
 
   if (!jquery) {

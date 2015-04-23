@@ -1,4 +1,4 @@
-define(function(require) {
+define('confirmation', function(require) {
   var template = require('templates/index').confirmation;
   var shopData = require('shop').data;
 
