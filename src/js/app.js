@@ -248,17 +248,13 @@ define('app', function(require) {
       if ($shippingInfo.opacity) {
         return;
       };
-
+      
       var $email = form.$el.find('.Celery-TextInput--email');
       var $cardNumber = form.$el.find('.Celery-TextInput--cardNumber');
       var $expiry = form.$el.find('.Celery-TextInput--expiry');
       var $cvc = form.$el.find('.Celery-TextInput--cvc');
 
-      if (($email.hasClass('is-valid') && 
-        $cardNumber.hasClass('is-valid') &&
-        $expiry.hasClass('is-valid') &&
-        $cvc.hasClass('is-valid')) || config.debug) 
-      {
+      var showForm = function(){
         $paymentInfo.transition({ opacity: 0, x: -100 }, 400, function() {
           $paymentInfo.addClass('u-hidden');
           $shippingInfo.addClass('ready');
@@ -275,12 +271,27 @@ define('app', function(require) {
 
         $backButton.removeClass('u-hidden');
         $closeButton.addClass('u-hidden');
-      } else {
-        form.validateField($email);
-        form.validateField($cardNumber);
-        form.validateField($expiry);
-        form.validateField($cvc);
       }
+
+      var paymentMethod = $('[name=payment_method]:checked').val();
+
+      if (paymentMethod === 'creditcards') {
+        if (($email.hasClass('is-valid') && 
+          $cardNumber.hasClass('is-valid') &&
+          $expiry.hasClass('is-valid') &&
+          $cvc.hasClass('is-valid')) || config.debug) 
+        {
+          showForm();
+        } else {
+          form.validateField($email);
+          form.validateField($cardNumber);
+          form.validateField($expiry);
+          form.validateField($cvc);
+        }
+      } else {
+        showForm();
+      }
+      
     },
 
     showPaymentForm: function(e) {
