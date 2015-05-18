@@ -598,6 +598,7 @@ define('app', function(require) {
         order.shipping_address.line2 = this._getApt();
         order.shipping_address.zip = this._getZip();
         order.shipping_address.city = this._getCity();
+        order.shipping_address.phone = this._getPhoneNumber();
       }
 
       order.shipping_address.country = this._getCountry() || 'zz';
@@ -705,6 +706,10 @@ define('app', function(require) {
 
     _getCity: function() {
       return this._getFieldValue('city');
+    }, 
+
+    _getPhoneNumber: function() {
+      return this._getFieldValue('phone');
     }, 
 
     _getState: function() {
