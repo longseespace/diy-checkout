@@ -775,7 +775,7 @@ define('app', function(require) {
         return 0;
       }
 
-      return base + ((quantity - 1) * item);
+      return item;
     },
 
     // Gets shipping rates based on country, falls back to base
@@ -820,7 +820,7 @@ define('app', function(require) {
       var discount = this._getDiscount();
       var taxes = this._getTaxes();
 
-      return (quantity * price) + shipping + taxes - discount;
+      return (price + shipping) * quantity + taxes - discount;
     }
   };
 });
